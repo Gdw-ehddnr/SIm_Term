@@ -30,7 +30,7 @@ def optimize_blocks():
     while True:
         try:
             sample_size = input("시뮬레이션할 데이터 샘플 크기를 입력하세요 (기본값: 10000): ")
-            if not sample_size:  # 입력없이 엔터를 누른 경우
+            if not sample_size:
                 sample_size = 10000
             else:
                 sample_size = int(sample_size)
@@ -58,23 +58,18 @@ def optimize_blocks():
     simulation_results = optimizer.simulate_block_ratio(num_simulations=num_simulations)
     end_time = time.time()
     
-    analysis = optimizer.analyze_results(simulation_results)
-    
-    print(f"\n=== 시뮬레이션 결과 (소요시간: {end_time - start_time:.1f}초) ===")
-    print(f"현재 평균 TAT: {analysis['current_tat']:.2f} 분")
-    print(f"최적화 후 평균 TAT: {analysis['optimized_tat']:.2f} 분")
-    print(f"개선율: {analysis['improvement']:.2f}%")
-    
-    print("\n현재 블록 할당:")
-    for cargo_type, count in analysis['block_counts']['current'].items():
-        print(f"{cargo_type}: {count}개 블록")
-    
-    print("\n최적화된 블록 할당:")
-    for cargo_type, count in analysis['block_counts']['optimized'].items():
-        print(f"{cargo_type}: {count}개 블록")
-
-    print("\n시뮬레이션 결과를 시각화합니다...")
-    optimizer.visualize_results(analysis)
+    if simulation_results:
+        print(f"\n=== 시뮬레이션 결과 (소요시간: {end_time - start_time:.1f}초) ===")
+        print(f"최적 TAT: {simulation_results['best_tat']:.2f} 분")
+        
+        print("\n최적화된 블록 할당:")
+        for cargo_type, blocks in simulation_results['best_allocation'].items():
+            print(f"{cargo_type}: {len(blocks)}개 블록 ({', '.join(blocks)})")
+        
+        # 시각화 실행
+        optimizer.visualize_results(simulation_results)
+    else:
+        print("시뮬레이션 실패: 유효한 결과를 얻지 못했습니다.")
 
 def main():
     while True:
